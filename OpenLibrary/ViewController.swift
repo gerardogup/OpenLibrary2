@@ -10,8 +10,12 @@ import UIKit
 
 class ViewController: UIViewController, UITextFieldDelegate {
     
-    @IBOutlet weak var tvDescripcion: UITextView!
     @IBOutlet weak var txtISBN: UITextField!
+    @IBOutlet weak var imgPortada: UIImageView!
+    @IBOutlet weak var lblTitulo: UILabel!
+    @IBOutlet weak var lblAutores: UILabel!
+    @IBOutlet weak var labelAutores: UILabel!
+    @IBOutlet weak var labelTitulo: UILabel!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -30,11 +34,40 @@ class ViewController: UIViewController, UITextFieldDelegate {
         let urls = "https://openlibrary.org/api/books?jscmd=data&format=json&bibkeys=ISBN:" + sender.text!
         let url = NSURL(string: urls)
 
-        let datos: NSData? = NSData(contentsOfURL: url!)
-        if(datos != nil){
-            let json = NSString(data:datos!, encoding: NSUTF8StringEncoding)
-            self.tvDescripcion.text = String(json)
-        } else {
+        let datos = NSData(contentsOfURL: url!)
+        do {
+            //let json = NSString(data:datos!, encoding: NSUTF8StringEncoding)
+            //self.tvDescripcion.text = String(json)
+            let json = try NSJSONSerialization.JSONObjectWithData(datos!, options: NSJSONReadingOptions.MutableLeaves)
+            let dico1 = json as! NSDictionary
+            let dico2 = dico1["ISBN:" + sender.text!] as! NSDictionary
+            self.lblTitulo.text = dico2["title"] as! NSString as String
+            let autores = dico2["authors"] as? [[String : String]]
+            self.lblAutores.text = ""
+            for autor in autores! {
+                let nombreDelAutor = autor["name"]
+                self.lblAutores.text?.appendContentsOf(nombreDelAutor!)
+                if autores!.count > 1 {
+                    self.lblAutores.text?.appendContentsOf(" & ")
+                }
+            }
+            labelTitulo.text = "Título"
+            if autores?.count > 1 {
+                labelAutores.text = "Autores"
+            } else {
+                labelAutores.text = "Autor"
+            }
+            if dico2["cover"] != nil {
+                let dico3 = dico2["cover"] as! NSDictionary
+                if let url = NSURL(string: dico3["medium"] as! NSString as String) {
+                    if let data = NSData(contentsOfURL: url) {
+                        imgPortada.image = UIImage(data: data)
+                        imgPortada.sizeToFit()
+                    }        
+                }
+            }
+            
+        } catch _ {
             alertaDeError()
         }
     }
@@ -49,6 +82,16 @@ class ViewController: UIViewController, UITextFieldDelegate {
             alerta.dismissViewControllerAnimated(true, completion: nil)
         }))
         presentViewController(alerta, animated: true, completion: nil)
+    }
+    
+    @IBAction func ocultaResultados(sender: AnyObject) {
+        if self.txtISBN.text == "" {
+            labelTitulo.text = ""
+            lblTitulo.text = ""
+            labelAutores.text = ""
+            lblAutores.text = ""
+            imgPortada.image = nil
+        }
     }
 }
 
