@@ -44,17 +44,21 @@ class ViewController: UIViewController, UITextFieldDelegate {
                 let dico2 = dico1["ISBN:" + sender.text!] as! NSDictionary
                 self.lblTitulo.text = dico2["title"] as! NSString as String
                 let autores = dico2["authors"] as? [[String : String]]
-                self.lblAutores.text = ""
-                for autor in autores! {
-                    let nombreDelAutor = autor["name"]
-                    self.lblAutores.text?.appendContentsOf(nombreDelAutor!)
-                    if autores!.count > 1 {
-                        self.lblAutores.text?.appendContentsOf(" & ")
+                if autores != nil {
+                    self.lblAutores.text = ""
+                    for autor in autores! {
+                        let nombreDelAutor = autor["name"]
+                        self.lblAutores.text?.appendContentsOf(nombreDelAutor!)
+                        if autores!.count > 1 {
+                            self.lblAutores.text?.appendContentsOf(" & ")
+                        }
                     }
                 }
                 labelTitulo.text = "Título"
                 if autores?.count > 1 {
                     labelAutores.text = "Autores"
+                } else if autores == nil {
+                    labelAutores.text = ""
                 } else {
                     labelAutores.text = "Autor"
                 }
