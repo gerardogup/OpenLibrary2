@@ -43,7 +43,6 @@
                                 <textInputTraits key="textInputTraits" keyboardType="numbersAndPunctuation" returnKeyType="search"/>
                                 <connections>
                                     <action selector="buscarISBN:" destination="BYZ-38-t0r" eventType="editingDidEndOnExit" id="aTR-Wk-pc0"/>
-                                    <action selector="ocultaResultados:" destination="BYZ-38-t0r" eventType="editingChanged" id="ioQ-Xi-1Sd"/>
                                 </connections>
                             </textField>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="YaS-71-NAA">
