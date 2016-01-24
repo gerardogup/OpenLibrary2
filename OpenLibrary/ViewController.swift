@@ -35,40 +35,45 @@ class ViewController: UIViewController, UITextFieldDelegate {
         let url = NSURL(string: urls)
 
         let datos = NSData(contentsOfURL: url!)
-        do {
-            //let json = NSString(data:datos!, encoding: NSUTF8StringEncoding)
-            //self.tvDescripcion.text = String(json)
-            let json = try NSJSONSerialization.JSONObjectWithData(datos!, options: NSJSONReadingOptions.MutableLeaves)
-            let dico1 = json as! NSDictionary
-            let dico2 = dico1["ISBN:" + sender.text!] as! NSDictionary
-            self.lblTitulo.text = dico2["title"] as! NSString as String
-            let autores = dico2["authors"] as? [[String : String]]
-            self.lblAutores.text = ""
-            for autor in autores! {
-                let nombreDelAutor = autor["name"]
-                self.lblAutores.text?.appendContentsOf(nombreDelAutor!)
-                if autores!.count > 1 {
-                    self.lblAutores.text?.appendContentsOf(" & ")
+        if datos != nil {
+            do {
+                //let json = NSString(data:datos!, encoding: NSUTF8StringEncoding)
+                //self.tvDescripcion.text = String(json)
+                let json = try NSJSONSerialization.JSONObjectWithData(datos!, options: NSJSONReadingOptions.MutableLeaves)
+                let dico1 = json as! NSDictionary
+                let dico2 = dico1["ISBN:" + sender.text!] as! NSDictionary
+                self.lblTitulo.text = dico2["title"] as! NSString as String
+                let autores = dico2["authors"] as? [[String : String]]
+                self.lblAutores.text = ""
+                for autor in autores! {
+                    let nombreDelAutor = autor["name"]
+                    self.lblAutores.text?.appendContentsOf(nombreDelAutor!)
+                    if autores!.count > 1 {
+                        self.lblAutores.text?.appendContentsOf(" & ")
+                    }
                 }
-            }
-            labelTitulo.text = "Título"
-            if autores?.count > 1 {
-                labelAutores.text = "Autores"
-            } else {
-                labelAutores.text = "Autor"
-            }
-            if dico2["cover"] != nil {
-                let dico3 = dico2["cover"] as! NSDictionary
-                if let url = NSURL(string: dico3["medium"] as! NSString as String) {
-                    if let data = NSData(contentsOfURL: url) {
-                        imgPortada.image = UIImage(data: data)
-                        imgPortada.sizeToFit()
-                    }        
+                labelTitulo.text = "Título"
+                if autores?.count > 1 {
+                    labelAutores.text = "Autores"
+                } else {
+                    labelAutores.text = "Autor"
                 }
+                if dico2["cover"] != nil {
+                    let dico3 = dico2["cover"] as! NSDictionary
+                    if let url = NSURL(string: dico3["medium"] as! NSString as String) {
+                        if let data = NSData(contentsOfURL: url) {
+                            imgPortada.image = UIImage(data: data)
+                            imgPortada.sizeToFit()
+                        }
+                    }
+                }
+                
+            } catch _ {
+                alertaDeError("Ha ocurrido un error con el origen de datos.")
             }
-            
-        } catch _ {
-            alertaDeError()
+
+        } else {
+            alertaDeError("Ha habido un error al tratar de obtener la información relacionada al ISBN. Verifica tu conexión a internet.")
         }
     }
     
@@ -76,8 +81,8 @@ class ViewController: UIViewController, UITextFieldDelegate {
         txtISBN.resignFirstResponder()
     }
     
-    func alertaDeError(){
-        let alerta = UIAlertController(title: "Error de conexión", message: "Ha habido un error al tratar de obtener la información relacionada al ISBN. Verifica tu conexión a internet.", preferredStyle: UIAlertControllerStyle.Alert)
+    func alertaDeError(mensaje: String){
+        let alerta = UIAlertController(title: "Error", message: mensaje, preferredStyle: UIAlertControllerStyle.Alert)
         alerta.addAction(UIAlertAction(title: "Ok", style: .Default, handler: { (action: UIAlertAction!) in
             alerta.dismissViewControllerAnimated(true, completion: nil)
         }))
